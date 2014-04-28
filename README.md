@@ -28,7 +28,7 @@ And it parses configuration files:
 
 It's a port of Go's [flag][] package with the addition of two functions: `ParseEnv` and `ParseFile`.
 
-[flag]: http://golang.org/src/pkg/flag
+[flag]: http://golang.org/src/pkg/flagconfiguration
 
 
 Why
@@ -36,7 +36,7 @@ Why
 
 Why not use one of the many INI, JSON or YAML parsers?
 
-I think it's best practice to keep your configration simple and use simple data types like bools, ints, floats and strings to control the behaviour of your application. Consider moving more complex data types to the "data" layer.
+I think it's best practice to keep your configuration simple and use simple data types like bools, ints, floats and strings to control the behaviour of your application. Consider moving more complex data types to the "data" layer.
 
 
 Usage
@@ -78,7 +78,7 @@ Create a configuration file:
 	# empty newlines and lines beginning with a "#" character are ignored.
 	name bob
 	
-	# keys and values can also be seperated by the "=" character
+	# keys and values can also be separated by the "=" character
 	age=20
 	
 	# booleans can me empty, set with 0, 1, true, false, etc
@@ -100,7 +100,7 @@ Prefix the environment variable with the name of your command in uppercase:
 	$ export COMMAND_AGE=44
 	$ go run ./command.go
 
-If you want to customize the prefix, just parse the environment variables mannually:
+If you want to customise the prefix, just parse the environment variables manually:
 
 	flag.Int("age", 24, "help message for age")
 
