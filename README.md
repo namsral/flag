@@ -1,14 +1,45 @@
 Flag
 ===
 
-This is a port of the [flag package][] from the Go standard library with the addition of parsing variables from configuration files and shell environments.
+Flag is a drop in replacement for Go's flag package:
 
-[flag package]: http://golang.org/src/pkg/flag
+	$ cat > gopher.go
+		package main
 
-This port has two extra functions; `ParseFile` and `ParseEnv`. Besides these two functions the flag package remains the same and should be interchangeble with the package in Go's standard library.
+		import "github/namsral/flag"
+
+		flag.Int("width", 10, "width of tunnel to dig")
+		flag.Parse()
+
+	$ go run gopher.go -width 12
+
+But it also parses environment variables:
+
+	$ export GOPHER_WIDTH=12
+	$ go run gopher.go
+
+And it parses configuration files:
+
+	$ cat > gopher.conf
+		width 12
+
+	$ go run gopher.go -config gopher.conf
 
 
-Use
+It's a port of Go's [flag][] package with the addition of two functions: `ParseEnv` and `ParseFile`.
+
+[flag]: http://golang.org/src/pkg/flag
+
+
+Why
+---
+
+Why not use one of the many INI, JSON or YAML parsers?
+
+I think it's best practice to keep your configration simple and use simple data types like bools, ints, floats and strings to control the behaviour of your application. Consider moving more complex data types to the "data" layer.
+
+
+Usage
 ---
 
 It's intended for projects which require a simple configuration made available through command-line flags, configuration files and shell environments. It's similar to the original `flag` package.
