@@ -1,42 +1,69 @@
 Flag
 ===
 
-Flag is a drop in replacement for Go's flag package:
+Flag is a drop in replacement for Go's flag package with the addition to parse files and environment variables.
 
-	$ cat > gopher.go
-		package main
+An example using a gopher:
 
-		import "github/namsral/flag"
+```go
+$ cat > gopher.go
+    package main
 
-		flag.Int("width", 10, "width of tunnel to dig")
-		flag.Parse()
+    import (
+        "fmt"
+    	"github/namsral/flag"
+	)
+    
+    var age int
+    
+    flag.IntVar(&age, "age", 0, "age of gopher")
+    flag.Parse()
+    
+    fmt.Print("age:", age)
 
-	$ go run gopher.go -width 12
+$ go run gopher.go -age 1
+age: 1
+```
 
-But it also parses environment variables:
+Same code but using an environment variable:
 
-	$ export GOPHER_WIDTH=12
-	$ go run gopher.go
+```go
+$ export GOPHER_AGE=2
+$ go run gopher.go
+age: 2
+```
+    
 
-And it parses configuration files:
+Same code but using a configuration file:
 
-	$ cat > gopher.conf
-		width 12
+```go
+$ cat > gopher.conf
+age 3
 
-	$ go run gopher.go -config gopher.conf
+$ go run gopher.go -config gopher.conf
+age: 3
+```
 
+The following table shows how flags are translated to environment variables and configuration files:
 
-It's a port of Go's [flag][] package with the addition of two functions: `ParseEnv` and `ParseFile`.
+| Type | Flag | Environment | File |
+| -- | :------------ |:---------------|:-----|
+| int | -age 2      | GOPHER_AGE=2        | age 2 |
+| bool | -female | GOPHER_FEMALE=true        | female true|
+| float | -length 175.5 | GOPHER_LENGTH=175.5 | length 175.5 |
+| string | -name Gloria | GOPHER_NAME=Gloria | name Gloria |
+
+This package is a port of Go's [flag][] package from the standard library with the addition of two functions `ParseEnv` and `ParseFile`.
 
 [flag]: http://golang.org/src/pkg/flagconfiguration
 
 
-Why
+Why?
 ---
 
 Why not use one of the many INI, JSON or YAML parsers?
 
-I think it's best practice to keep your configuration simple and use simple data types like bools, ints, floats and strings to control the behaviour of your application. Consider moving more complex data types to the "data" layer.
+I find it best practice to have simple configuration options to control the behaviour of an applications when it starts up. Use basic types like ints, floats and strings for configuration options and store more complex data structures in the "datastore" layer.
 
 
 Usage
@@ -46,12 +73,14 @@ It's intended for projects which require a simple configuration made available t
 
 Example:
 
-	import "github/namsral/flag"
-	
-	flag.String("config", "", "help message for config")
-	flag.Int("age", 24, "help message for age")
-	
-	flag.Parse()
+```go
+import "github/namsral/flag"
+
+flag.String("config", "", "help message for config")
+flag.Int("age", 24, "help message for age")
+
+flag.Parse()
+```
 
 Order of precedence:
 
@@ -62,50 +91,63 @@ Order of precedence:
 
 The order can be changed by parsing manually:
 
-		flag.String("config", "", "help message for config")
-		flag.Int("age", 24, "help message for age")
-		
-		flag.CommandLine.ParseEnv(path.Base(os.Args[0]))
-		flag.CommandLine.Parse(os.Args[1:])
-		flag.CommandLine.ParseFile("/etc/command.conf")
+```go
+flag.String("config", "", "help message for config")
+flag.Int("age", 24, "help message for age")
 
+flag.CommandLine.ParseEnv(path.Base(os.Args[0]))
+flag.CommandLine.Parse(os.Args[1:])
+flag.CommandLine.ParseFile("/etc/command.conf")
+```
 
 #### Parsing Configuration Files
 
 Create a configuration file:
 
-	$ cat > /etc/command.conf
-	# empty newlines and lines beginning with a "#" character are ignored.
-	name bob
-	
-	# keys and values can also be separated by the "=" character
-	age=20
-	
-	# booleans can me empty, set with 0, 1, true, false, etc
-	hacker
-	
+```go
+$ cat > /etc/command.conf
+# empty newlines and lines beginning with a "#" character are ignored.
+name bob
+
+# keys and values can also be separated by the "=" character
+age=20
+
+# booleans can me empty, set with 0, 1, true, false, etc
+hacker
+```
+
 Add a "config" flag:
 
-	flag.String("config", "", "help message for config")
-		
+```go
+flag.String("config", "", "help message for config")
+```
+
 Run the command:
 
-	$ go run ./command.go -config /etc/command.conf
-
+```go
+$ go run ./command.go -config /etc/command.conf
+```
 
 #### Parsing Environment Variables
 
 Prefix the environment variable with the name of your command in uppercase:
 
-	$ export COMMAND_AGE=44
-	$ go run ./command.go
+```go
+$ export COMMAND_AGE=44
+$ go run ./command.go
+```
 
 If you want to customise the prefix, just parse the environment variables manually:
 
-	flag.Int("age", 24, "help message for age")
+```go
+flag.Int("age", 24, "help message for age")
+flag.CommandLine.ParseEnv("MYCOMMAND")
+```
 
-	flag.CommandLine.ParseEnv("MYCOMMAND")
-	
+For more examples see the [examples][] directory in the project repository.
+
+[examples]: https://github.com/namsral/flag/tree/master/examples
+
 That's it.
 
 
