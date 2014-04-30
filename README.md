@@ -47,9 +47,9 @@ age: 3
 The following table shows how flags are translated to environment variables and configuration files:
 
 | Type | Flag | Environment | File |
-| -- | :------------ |:---------------|:-----|
-| int | -age 2      | GOPHER_AGE=2        | age 2 |
-| bool | -female | GOPHER_FEMALE=true        | female true|
+| ---- | ---- | ----------- | ---- |
+| int | -age 2 | GOPHER_AGE=2 | age 2 |
+| bool | -female | GOPHER_FEMALE=true | female true |
 | float | -length 175.5 | GOPHER_LENGTH=175.5 | length 175.5 |
 | string | -name Gloria | GOPHER_NAME=Gloria | name Gloria |
 
