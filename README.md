@@ -1,7 +1,7 @@
 Flag
 ===
 
-Flag is a drop in replacement for Go's flag package with the addition to parse files and environment variables.
+Flag is a drop in replacement for Go's flag package with the addition to parse files and environment variables. If you support the [twelve-factor app methodology][], `flag` complies with the third factor; "Store config in the environment".
 
 An example using a gopher:
 
