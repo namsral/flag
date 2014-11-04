@@ -7,14 +7,13 @@ package flag_test
 import (
 	"bytes"
 	"fmt"
+	. "github.com/namsral/flag"
 	"os"
 	"sort"
 	"strings"
+	"syscall"
 	"testing"
 	"time"
-    "path"
-    "syscall"
-	. "github.com/namsral/flag"
 )
 
 func boolString(s string) string {
@@ -373,108 +372,105 @@ func TestHelp(t *testing.T) {
 // Test parsing a environment variables
 func TestParseEnv(t *testing.T) {
 
-    prefix := path.Base(os.Args[0])
-    
-    syscall.Setenv(fmt.Sprintf("%s_BOOL", prefix), "")
-    syscall.Setenv(fmt.Sprintf("%s_BOOL2", prefix), "true")
-    syscall.Setenv(fmt.Sprintf("%s_INT", prefix), "22")
-    syscall.Setenv(fmt.Sprintf("%s_INT64", prefix), "0x23")
-    syscall.Setenv(fmt.Sprintf("%s_UINT", prefix), "24")
-    syscall.Setenv(fmt.Sprintf("%s_UINT64", prefix), "25")
-    syscall.Setenv(fmt.Sprintf("%s_STRING", prefix), "hello")
-    syscall.Setenv(fmt.Sprintf("%s_FLOAT64", prefix), "2718e28")
-    syscall.Setenv(fmt.Sprintf("%s_DURATION", prefix), "2m")
+	syscall.Setenv("BOOL", "")
+	syscall.Setenv("BOOL2", "true")
+	syscall.Setenv("INT", "22")
+	syscall.Setenv("INT64", "0x23")
+	syscall.Setenv("UINT", "24")
+	syscall.Setenv("UINT64", "25")
+	syscall.Setenv("STRING", "hello")
+	syscall.Setenv("FLOAT64", "2718e28")
+	syscall.Setenv("DURATION", "2m")
 
-    f := NewFlagSet(os.Args[0], ContinueOnError)
+	f := NewFlagSet(os.Args[0], ContinueOnError)
 
-    boolFlag := f.Bool("bool", false, "bool value")
-    bool2Flag := f.Bool("bool2", false, "bool2 value")
-    intFlag := f.Int("int", 0, "int value")
-    int64Flag := f.Int64("int64", 0, "int64 value")
-    uintFlag := f.Uint("uint", 0, "uint value")
-    uint64Flag := f.Uint64("uint64", 0, "uint64 value")
-    stringFlag := f.String("string", "0", "string value")
-    float64Flag := f.Float64("float64", 0, "float64 value")
-    durationFlag := f.Duration("duration", 5*time.Second, "time.Duration value")
+	boolFlag := f.Bool("bool", false, "bool value")
+	bool2Flag := f.Bool("bool2", false, "bool2 value")
+	intFlag := f.Int("int", 0, "int value")
+	int64Flag := f.Int64("int64", 0, "int64 value")
+	uintFlag := f.Uint("uint", 0, "uint value")
+	uint64Flag := f.Uint64("uint64", 0, "uint64 value")
+	stringFlag := f.String("string", "0", "string value")
+	float64Flag := f.Float64("float64", 0, "float64 value")
+	durationFlag := f.Duration("duration", 5*time.Second, "time.Duration value")
 
-    err := f.ParseEnv(prefix)
-    if err != nil {
-        t.Fatal("expected no error; got ", err)
-    }
-    if *boolFlag != true {
-        t.Error("bool flag should be true, is ", *boolFlag)
-    }
-    if *bool2Flag != true {
-        t.Error("bool2 flag should be true, is ", *bool2Flag)
-    }
-    if *intFlag != 22 {
-        t.Error("int flag should be 22, is ", *intFlag)
-    }
-    if *int64Flag != 0x23 {
-        t.Error("int64 flag should be 0x23, is ", *int64Flag)
-    }
-    if *uintFlag != 24 {
-        t.Error("uint flag should be 24, is ", *uintFlag)
-    }
-    if *uint64Flag != 25 {
-        t.Error("uint64 flag should be 25, is ", *uint64Flag)
-    }
-    if *stringFlag != "hello" {
-        t.Error("string flag should be `hello`, is ", *stringFlag)
-    }
-    if *float64Flag != 2718e28 {
-        t.Error("float64 flag should be 2718e28, is ", *float64Flag)
-    }
-    if *durationFlag != 2*time.Minute {
-        t.Error("duration flag should be 2m, is ", *durationFlag)
-    }
+	err := f.ParseEnv(os.Environ())
+	if err != nil {
+		t.Fatal("expected no error; got ", err)
+	}
+	if *boolFlag != true {
+		t.Error("bool flag should be true, is ", *boolFlag)
+	}
+	if *bool2Flag != true {
+		t.Error("bool2 flag should be true, is ", *bool2Flag)
+	}
+	if *intFlag != 22 {
+		t.Error("int flag should be 22, is ", *intFlag)
+	}
+	if *int64Flag != 0x23 {
+		t.Error("int64 flag should be 0x23, is ", *int64Flag)
+	}
+	if *uintFlag != 24 {
+		t.Error("uint flag should be 24, is ", *uintFlag)
+	}
+	if *uint64Flag != 25 {
+		t.Error("uint64 flag should be 25, is ", *uint64Flag)
+	}
+	if *stringFlag != "hello" {
+		t.Error("string flag should be `hello`, is ", *stringFlag)
+	}
+	if *float64Flag != 2718e28 {
+		t.Error("float64 flag should be 2718e28, is ", *float64Flag)
+	}
+	if *durationFlag != 2*time.Minute {
+		t.Error("duration flag should be 2m, is ", *durationFlag)
+	}
 }
-
 
 // Test parsing a configuration file
 func TestParseFile(t *testing.T) {
 
-    f := NewFlagSet(os.Args[0], ContinueOnError)
+	f := NewFlagSet(os.Args[0], ContinueOnError)
 
-    boolFlag := f.Bool("bool", false, "bool value")
-    bool2Flag := f.Bool("bool2", false, "bool2 value")
-    intFlag := f.Int("int", 0, "int value")
-    int64Flag := f.Int64("int64", 0, "int64 value")
-    uintFlag := f.Uint("uint", 0, "uint value")
-    uint64Flag := f.Uint64("uint64", 0, "uint64 value")
-    stringFlag := f.String("string", "0", "string value")
-    float64Flag := f.Float64("float64", 0, "float64 value")
-    durationFlag := f.Duration("duration", 5*time.Second, "time.Duration value")
+	boolFlag := f.Bool("bool", false, "bool value")
+	bool2Flag := f.Bool("bool2", false, "bool2 value")
+	intFlag := f.Int("int", 0, "int value")
+	int64Flag := f.Int64("int64", 0, "int64 value")
+	uintFlag := f.Uint("uint", 0, "uint value")
+	uint64Flag := f.Uint64("uint64", 0, "uint64 value")
+	stringFlag := f.String("string", "0", "string value")
+	float64Flag := f.Float64("float64", 0, "float64 value")
+	durationFlag := f.Duration("duration", 5*time.Second, "time.Duration value")
 
-    err := f.ParseFile("./testdata/test.conf")
-    if err != nil {
-        t.Fatal("expected no error; got ", err)
-    }
-    if *boolFlag != true {
-        t.Error("bool flag should be true, is ", *boolFlag)
-    }
-    if *bool2Flag != true {
-        t.Error("bool2 flag should be true, is ", *bool2Flag)
-    }
-    if *intFlag != 22 {
-        t.Error("int flag should be 22, is ", *intFlag)
-    }
-    if *int64Flag != 0x23 {
-        t.Error("int64 flag should be 0x23, is ", *int64Flag)
-    }
-    if *uintFlag != 24 {
-        t.Error("uint flag should be 24, is ", *uintFlag)
-    }
-    if *uint64Flag != 25 {
-        t.Error("uint64 flag should be 25, is ", *uint64Flag)
-    }
-    if *stringFlag != "hello" {
-        t.Error("string flag should be `hello`, is ", *stringFlag)
-    }
-    if *float64Flag != 2718e28 {
-        t.Error("float64 flag should be 2718e28, is ", *float64Flag)
-    }
-    if *durationFlag != 2*time.Minute {
-        t.Error("duration flag should be 2m, is ", *durationFlag)
-    }
+	err := f.ParseFile("./testdata/test.conf")
+	if err != nil {
+		t.Fatal("expected no error; got ", err)
+	}
+	if *boolFlag != true {
+		t.Error("bool flag should be true, is ", *boolFlag)
+	}
+	if *bool2Flag != true {
+		t.Error("bool2 flag should be true, is ", *bool2Flag)
+	}
+	if *intFlag != 22 {
+		t.Error("int flag should be 22, is ", *intFlag)
+	}
+	if *int64Flag != 0x23 {
+		t.Error("int64 flag should be 0x23, is ", *int64Flag)
+	}
+	if *uintFlag != 24 {
+		t.Error("uint flag should be 24, is ", *uintFlag)
+	}
+	if *uint64Flag != 25 {
+		t.Error("uint64 flag should be 25, is ", *uint64Flag)
+	}
+	if *stringFlag != "hello" {
+		t.Error("string flag should be `hello`, is ", *stringFlag)
+	}
+	if *float64Flag != 2718e28 {
+		t.Error("float64 flag should be 2718e28, is ", *float64Flag)
+	}
+	if *durationFlag != 2*time.Minute {
+		t.Error("duration flag should be 2m, is ", *durationFlag)
+	}
 }

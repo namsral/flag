@@ -28,7 +28,7 @@ age: 1
 Same code but using an environment variable:
 
 ```go
-$ export GOPHER_AGE=2
+$ export AGE=2
 $ go run gopher.go
 age: 2
 ```
@@ -48,10 +48,10 @@ The following table shows how flags are translated to environment variables and 
 
 | Type | Flag | Environment | File |
 | -- | :------------ |:---------------|:-----|
-| int | -age 2      | GOPHER_AGE=2        | age 2 |
-| bool | -female | GOPHER_FEMALE=true        | female true|
-| float | -length 175.5 | GOPHER_LENGTH=175.5 | length 175.5 |
-| string | -name Gloria | GOPHER_NAME=Gloria | name Gloria |
+| int | -age 2      | AGE=2        | age 2 |
+| bool | -female | FEMALE=true        | female true|
+| float | -length 175.5 | LENGTH=175.5 | length 175.5 |
+| string | -name Gloria | NAME=Gloria | name Gloria |
 
 This package is a port of Go's [flag][] package from the standard library with the addition of two functions `ParseEnv` and `ParseFile`.
 
@@ -95,7 +95,7 @@ The order can be changed by parsing manually:
 flag.String("config", "", "help message for config")
 flag.Int("age", 24, "help message for age")
 
-flag.CommandLine.ParseEnv(path.Base(os.Args[0]))
+flag.CommandLine.ParseEnv(os.Environ())
 flag.CommandLine.Parse(os.Args[1:])
 flag.CommandLine.ParseFile("/etc/command.conf")
 ```
@@ -133,7 +133,7 @@ $ go run ./command.go -config /etc/command.conf
 Prefix the environment variable with the name of your command in uppercase:
 
 ```go
-$ export COMMAND_AGE=44
+$ export AGE=44
 $ go run ./command.go
 ```
 
@@ -141,7 +141,7 @@ If you want to customise the prefix, just parse the environment variables manual
 
 ```go
 flag.Int("age", 24, "help message for age")
-flag.CommandLine.ParseEnv("MYCOMMAND")
+flag.CommandLine.ParseEnv(os.Environ())
 ```
 
 For more examples see the [examples][] directory in the project repository.
