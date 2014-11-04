@@ -91,16 +91,6 @@ Order of precedence:
 3. Configuration file
 4. Default values
 
-The order can be changed by parsing manually:
-
-```go
-flag.String("config", "", "help message for config")
-flag.Int("age", 24, "help message for age")
-
-flag.CommandLine.ParseEnv(os.Environ())
-flag.CommandLine.Parse(os.Args[1:])
-flag.CommandLine.ParseFile("/etc/command.conf")
-```
 
 #### Parsing Configuration Files
 
@@ -137,13 +127,6 @@ Prefix the environment variable with the name of your command in uppercase:
 ```go
 $ export AGE=44
 $ go run ./command.go
-```
-
-If you want to customise the prefix, just parse the environment variables manually:
-
-```go
-flag.Int("age", 24, "help message for age")
-flag.CommandLine.ParseEnv(os.Environ())
 ```
 
 For more examples see the [examples][] directory in the project repository.

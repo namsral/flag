@@ -836,6 +836,11 @@ func (f *FlagSet) ParseEnv(environ []string) error {
 
 	for _, flag := range m {
 		name := flag.Name
+		_, set := f.actual[name]
+		if set {
+			continue
+		}
+
 		flag, alreadythere := m[name]
 		if !alreadythere {
 			if name == "help" || name == "h" { // special case for nice help message.
