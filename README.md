@@ -1,7 +1,9 @@
 Flag
 ===
 
-Flag is a drop in replacement for Go's flag package with the addition to parse files and environment variables.
+Flag is a drop in replacement for Go's flag package with the addition to parse files and environment variables. If you support the [twelve-factor app methodology][], Flag complies with the third factor; "Store config in the environment".
+
+[twelve-factor app methodology]: http://12factor.net
 
 An example using a gopher:
 
@@ -46,12 +48,12 @@ age: 3
 
 The following table shows how flags are translated to environment variables and configuration files:
 
-| Type | Flag | Environment | File |
-| -- | :------------ |:---------------|:-----|
-| int | -age 2      | AGE=2        | age 2 |
-| bool | -female | FEMALE=true        | female true|
-| float | -length 175.5 | LENGTH=175.5 | length 175.5 |
-| string | -name Gloria | NAME=Gloria | name Gloria |
+| Type   | Flag          | Environment  | File         |
+| ------ | :------------ |:------------ |:------------ |
+| int    | -age 2        | AGE=2        | age 2        |
+| bool   | -female       | FEMALE=true  | female true  |
+| float  | -length 175.5 | LENGTH=175.5 | length 175.5 |
+| string | -name Gloria  | NAME=Gloria  | name Gloria  |
 
 This package is a port of Go's [flag][] package from the standard library with the addition of two functions `ParseEnv` and `ParseFile`.
 
