@@ -851,7 +851,7 @@ func (f *FlagSet) ParseEnv(environ []string) error {
 		}
 
 		env_key := strings.ToUpper(flag.Name)
-		env_key = strings.Replace(env_key, "-", "_", 0)
+		env_key = strings.Replace(env_key, "-", "_", -1)
 
 		value, is_set := env[env_key]
 		if !is_set {
