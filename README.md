@@ -13,7 +13,7 @@ $ cat > gopher.go
 
     import (
         "fmt"
-    	"github/namsral/flag"
+    	"github.com/namsral/flag"
 	)
     
     var age int
