@@ -104,7 +104,7 @@ name bob
 # keys and values can also be separated by the "=" character
 age=20
 
-# booleans can me empty, set with 0, 1, true, false, etc
+# booleans can be empty, set with 0, 1, true, false, etc
 hacker
 ```
 
