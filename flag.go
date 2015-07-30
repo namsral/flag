@@ -73,6 +73,10 @@ import (
 	"time"
 )
 
+// EnvironmentPrefix defines a string that will be implicitely prefixed to a
+// flag name before looking it up in the environment variables.
+var EnvironmentPrefix = ""
+
 // ErrHelp is the error returned if the flag -help is invoked but no such flag is defined.
 var ErrHelp = errors.New("flag: help requested")
 
@@ -269,6 +273,7 @@ type FlagSet struct {
 	parsed        bool
 	actual        map[string]*Flag
 	formal        map[string]*Flag
+	envPrefix     string   // prefix to all env variable names
 	args          []string // arguments after flags
 	exitOnError   bool     // does the program exit if there's an error?
 	errorHandling ErrorHandling
@@ -851,6 +856,9 @@ func (f *FlagSet) ParseEnv(environ []string) error {
 		}
 
 		envKey := strings.ToUpper(flag.Name)
+		if f.envPrefix != "" {
+			envKey = f.envPrefix + "_" + envKey
+		}
 		envKey = strings.Replace(envKey, "-", "_", -1)
 
 		value, isSet := env[envKey]
@@ -1013,10 +1021,20 @@ func NewFlagSet(name string, errorHandling ErrorHandling) *FlagSet {
 	return f
 }
 
-// Init sets the name and error handling property for a flag set.
-// By default, the zero FlagSet uses an empty name and the
+// NewFlagSetWithEnvPrefix returns a new empty flag set with the specified name,
+// environment variable prefix, and error handling property.
+func NewFlagSetWithEnvPrefix(name string, prefix string, errorHandling ErrorHandling) *FlagSet {
+	f := NewFlagSet(name, errorHandling)
+	f.envPrefix = prefix
+	return f
+}
+
+// Init sets the name, environment name prefix, and error handling property
+// for a flag set.
+// By default, the zero FlagSet uses an empty name, EnvironmentPrefix, and the
 // ContinueOnError error handling policy.
 func (f *FlagSet) Init(name string, errorHandling ErrorHandling) {
 	f.name = name
+	f.envPrefix = EnvironmentPrefix
 	f.errorHandling = errorHandling
 }
