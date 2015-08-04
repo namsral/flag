@@ -97,7 +97,7 @@ Order of precedence:
 Create a configuration file:
 
 ```go
-$ cat > /etc/command.conf
+$ cat > ./gopher.conf
 # empty newlines and lines beginning with a "#" character are ignored.
 name bob
 
@@ -117,17 +117,32 @@ flag.String("config", "", "help message for config")
 Run the command:
 
 ```go
-$ go run ./command.go -config /etc/command.conf
+$ go run ./gopher.go -config ./gopher.conf
 ```
 
 #### Parsing Environment Variables
 
-Prefix the environment variable with the name of your command in uppercase:
+Environment variables are parsed 1-on-1 with defined flags:
 
 ```go
 $ export AGE=44
-$ go run ./command.go
+$ go run ./gopher.go
+age=44
 ```
+
+
+You can also parse prefixed environment variables by setting a prefix name when creating a new empty flag set:
+
+```go
+fs := flag.NewFlagSetWithEnvPrefix(os.Args[0], "GO", 0)
+fs.Int("age", 24, "help message for age")
+fs.Parse(os.Args[1:])
+...
+$ go export GO_AGE=33
+$ go run ./gopher.go
+age=33
+```
+
 
 For more examples see the [examples][] directory in the project repository.
 
