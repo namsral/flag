@@ -222,6 +222,35 @@ func TestFlagSetParse(t *testing.T) {
 	testParse(NewFlagSet("test", ContinueOnError), t)
 }
 
+func TestFlagSetParseErrors(t *testing.T) {
+	fs := NewFlagSet("test", ContinueOnError)
+	fs.Int("int", 0, "int value")
+
+	args := []string{"-int", "bad"}
+	expected := `invalid value "bad" for flag -int: strconv.ParseInt: parsing "bad": invalid syntax`
+	if err := fs.Parse(args); err == nil || err.Error() != expected {
+		t.Errorf("expected error %q parsing from args, got: %v", expected, err)
+	}
+
+	if err := os.Setenv("INT", "bad"); err != nil {
+		t.Fatalf("error setting env: %s", err.Error())
+	}
+	expected = `invalid value "bad" for environment variable int: strconv.ParseInt: parsing "bad": invalid syntax`
+	if err := fs.Parse([]string{}); err == nil || err.Error() != expected {
+		t.Errorf("expected error %q parsing from env, got: %v", expected, err)
+	}
+	if err := os.Unsetenv("INT"); err != nil {
+		t.Fatalf("error unsetting env: %s", err.Error())
+	}
+
+	fs.String("config", "", "config filename")
+	args = []string{"-config", "testdata/bad_test.conf"}
+	expected = `invalid value "bad" for configuration variable int: strconv.ParseInt: parsing "bad": invalid syntax`
+	if err := fs.Parse(args); err == nil || err.Error() != expected {
+		t.Errorf("expected error %q parsing from config, got: %v", expected, err)
+	}
+}
+
 // Declare a user-defined flag type.
 type flagVar []string
 

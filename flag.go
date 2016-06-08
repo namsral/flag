@@ -813,12 +813,16 @@ func (f *FlagSet) Parse(arguments []string) error {
 	}
 
 	// Parse environment variables
-	f.ParseEnv(os.Environ())
+	if err := f.ParseEnv(os.Environ()); err != nil {
+		return err
+	}
 
 	// Parse configuration from file
 	configFlag := f.actual["config"]
 	if configFlag != nil {
-		f.ParseFile(configFlag.Value.String())
+		if err := f.ParseFile(configFlag.Value.String()); err != nil {
+			return err
+		}
 	}
 
 	return nil
