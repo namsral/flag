@@ -502,3 +502,10 @@ func TestParseFile(t *testing.T) {
 		t.Error("duration flag should be 2m, is ", *durationFlag)
 	}
 }
+
+func TestParseFileUnknownFlag(t *testing.T) {
+	f := NewFlagSet("test", ContinueOnError)
+	if err := f.ParseFile("./testdata/bad_test.conf"); err == nil {
+		t.Error("parse did not fail for unknown flag; ", err)
+	}
+}
