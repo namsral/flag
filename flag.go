@@ -814,6 +814,14 @@ func (f *FlagSet) Parse(arguments []string) error {
 
 	// Parse environment variables
 	if err := f.ParseEnv(os.Environ()); err != nil {
+		switch f.errorHandling {
+		case ContinueOnError:
+			return err
+		case ExitOnError:
+			os.Exit(2)
+		case PanicOnError:
+			panic(err)
+		}
 		return err
 	}
 
@@ -821,6 +829,14 @@ func (f *FlagSet) Parse(arguments []string) error {
 	configFlag := f.actual["config"]
 	if configFlag != nil {
 		if err := f.ParseFile(configFlag.Value.String()); err != nil {
+			switch f.errorHandling {
+			case ContinueOnError:
+				return err
+			case ExitOnError:
+				os.Exit(2)
+			case PanicOnError:
+				panic(err)
+			}
 			return err
 		}
 	}
