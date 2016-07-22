@@ -60,6 +60,14 @@ This package is a port of Go's [flag][] package from the standard library with t
 [flag]: http://golang.org/src/pkg/flagconfiguration
 
 
+Goals
+-----
+
+- Compatability with the original `flag` package
+- Support the [twelve-factor app methodology][]
+- Uniform user experience between the three input methods
+
+
 Why?
 ---
 
