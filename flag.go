@@ -901,10 +901,6 @@ func (f *FlagSet) ParseEnv(environ []string) error {
 				fv.Set("true")
 			}
 		} else {
-			if !hasValue {
-				return f.failf("environment variable needs an value: %s", name)
-			}
-
 			if err := flag.Value.Set(value); err != nil {
 				return f.failf("invalid value %q for environment variable %s: %v", value, name, err)
 			}
@@ -986,10 +982,6 @@ func (f *FlagSet) ParseFile(path string) error {
 				fv.Set("true")
 			}
 		} else {
-			if !hasValue {
-				return f.failf("configuration variable needs an argument: %s", name)
-			}
-
 			if err := flag.Value.Set(value); err != nil {
 				return f.failf("invalid value %q for configuration variable %s: %v", value, name, err)
 			}
