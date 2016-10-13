@@ -509,3 +509,10 @@ func TestParseFileUnknownFlag(t *testing.T) {
 		t.Error("parse did not fail for unknown flag; ", err)
 	}
 }
+
+func TestTestingPackageFlags(t *testing.T) {
+	f := NewFlagSet("test", ContinueOnError)
+	if err := f.Parse([]string{"-test.v", "-test.count", "1"}); err != nil {
+		t.Error(err)
+	}
+}
