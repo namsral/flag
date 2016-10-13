@@ -737,6 +737,11 @@ func (f *FlagSet) parseOne() (bool, error) {
 		return false, f.failf("bad flag syntax: %s", s)
 	}
 
+	// ignore go test flags
+	if strings.HasPrefix(name, "test.") {
+		return false, nil
+	}
+
 	// it's a flag. does it have an argument?
 	f.args = f.args[1:]
 	hasValue := false
