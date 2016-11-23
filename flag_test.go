@@ -517,7 +517,7 @@ func TestTestingPackageFlags(t *testing.T) {
 	}
 }
 
-func TestConfFileFlagName(t *testing.T) {
+func TestDefaultConfigFlagname(t *testing.T) {
 	f := NewFlagSet("test", ContinueOnError)
 
 	f.Bool("bool", false, "bool value")
@@ -542,5 +542,17 @@ func TestConfFileFlagName(t *testing.T) {
 
 	if *stringFlag != "hello" {
 		t.Error("string flag should be `hello`, is", *stringFlag)
+	}
+}
+
+func TestDefaultConfigFlagnameMissingFile(t *testing.T) {
+	f := NewFlagSet("test", ContinueOnError)
+	f.String(DefaultConfigFlagname, "./testdata/missing", "config path")
+
+	if err := os.Unsetenv("STRING"); err != nil {
+		t.Error(err)
+	}
+	if err := f.Parse([]string{}); err == nil {
+		t.Error("expected error of missing config file, got nil")
 	}
 }

@@ -836,17 +836,15 @@ func (f *FlagSet) Parse(arguments []string) error {
 	}
 
 	// Parse configuration from file
-	configFlag := f.actual[DefaultConfigFlagname]
-	if configFlag == nil {
-		// Use the default config if it exists on disk
-		if cf := f.formal[DefaultConfigFlagname]; cf != nil && cf.Value.String() != "" {
-			if _, err := os.Stat(cf.Value.String()); !os.IsNotExist(err) {
-				configFlag = cf
-			}
-		}
+	var cFile string
+	if cf := f.formal[DefaultConfigFlagname]; cf != nil {
+		cFile = cf.Value.String()
 	}
-	if configFlag != nil {
-		if err := f.ParseFile(configFlag.Value.String()); err != nil {
+	if cf := f.actual[DefaultConfigFlagname]; cf != nil {
+		cFile = cf.Value.String()
+	}
+	if cFile != "" {
+		if err := f.ParseFile(cFile); err != nil {
 			switch f.errorHandling {
 			case ContinueOnError:
 				return err
