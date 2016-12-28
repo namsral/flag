@@ -223,35 +223,6 @@ func TestFlagSetParse(t *testing.T) {
 	testParse(NewFlagSet("test", ContinueOnError), t)
 }
 
-func TestFlagSetParseErrors(t *testing.T) {
-	fs := NewFlagSet("test", ContinueOnError)
-	fs.Int("int", 0, "int value")
-
-	args := []string{"-int", "bad"}
-	expected := `invalid value "bad" for flag -int: strconv.ParseInt: parsing "bad": invalid syntax`
-	if err := fs.Parse(args); err == nil || err.Error() != expected {
-		t.Errorf("expected error %q parsing from args, got: %v", expected, err)
-	}
-
-	if err := os.Setenv("INT", "bad"); err != nil {
-		t.Fatalf("error setting env: %s", err.Error())
-	}
-	expected = `invalid value "bad" for environment variable int: strconv.ParseInt: parsing "bad": invalid syntax`
-	if err := fs.Parse([]string{}); err == nil || err.Error() != expected {
-		t.Errorf("expected error %q parsing from env, got: %v", expected, err)
-	}
-	if err := os.Unsetenv("INT"); err != nil {
-		t.Fatalf("error unsetting env: %s", err.Error())
-	}
-
-	fs.String("config", "", "config filename")
-	args = []string{"-config", "testdata/bad_test.conf"}
-	expected = `invalid value "bad" for configuration variable int: strconv.ParseInt: parsing "bad": invalid syntax`
-	if err := fs.Parse(args); err == nil || err.Error() != expected {
-		t.Errorf("expected error %q parsing from config, got: %v", expected, err)
-	}
-}
-
 // Declare a user-defined flag type.
 type flagVar []string
 
@@ -278,6 +249,16 @@ func TestUserDefined(t *testing.T) {
 	expect := "[1 2 3]"
 	if v.String() != expect {
 		t.Errorf("expected value %q got %q", expect, v.String())
+	}
+}
+
+func TestUserDefinedForCommandLine(t *testing.T) {
+	const help = "HELP"
+	var result string
+	ResetForTesting(func() { result = help })
+	Usage()
+	if result != help {
+		t.Fatalf("got %q; expected %q", result, help)
 	}
 }
 
@@ -398,9 +379,40 @@ func TestHelp(t *testing.T) {
 	}
 }
 
-func TestTestingPackageFlags(t *testing.T) {
-	f := NewFlagSet("test", ContinueOnError)
-	if err := f.Parse([]string{"-test.v", "-test.count", "1"}); err != nil {
-		t.Error(err)
+const defaultOutput = `  -A	for bootstrapping, allow 'any' type
+  -Alongflagname
+    	disable bounds checking
+  -C	a boolean defaulting to true (default true)
+  -D path
+    	set relative path for local imports
+  -F number
+    	a non-zero number (default 2.7)
+  -G float
+    	a float that defaults to zero
+  -N int
+    	a non-zero int (default 27)
+  -Z int
+    	an int that defaults to zero
+  -maxT timeout
+    	set timeout for dial
+`
+
+func TestPrintDefaults(t *testing.T) {
+	fs := NewFlagSet("print defaults test", ContinueOnError)
+	var buf bytes.Buffer
+	fs.SetOutput(&buf)
+	fs.Bool("A", false, "for bootstrapping, allow 'any' type")
+	fs.Bool("Alongflagname", false, "disable bounds checking")
+	fs.Bool("C", true, "a boolean defaulting to true")
+	fs.String("D", "", "set relative `path` for local imports")
+	fs.Float64("F", 2.7, "a non-zero `number`")
+	fs.Float64("G", 0, "a float that defaults to zero")
+	fs.Int("N", 27, "a non-zero int")
+	fs.Int("Z", 0, "an int that defaults to zero")
+	fs.Duration("maxT", 0, "set `timeout` for dial")
+	fs.PrintDefaults()
+	got := buf.String()
+	if got != defaultOutput {
+		t.Errorf("got %q want %q\n", got, defaultOutput)
 	}
 }
