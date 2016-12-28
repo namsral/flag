@@ -2,67 +2,67 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-/*Package flag implements command-line flag parsing.
-okdaokddadok
-Usage:
+/*
+	Package flag implements command-line flag parsing.
 
-Define flags using flag.String(), Bool(), Int(), etc.
+	Usage:
 
-This declares an integer flag, -flagname, stored in the pointer ip, with type *int.
-    import "flag"
-    var ip = flag.Int("flagname", 1234, "help message for flagname")
-If you like, you can bind the flag to a variable using the Var() functions.
-    var flagvar int
-    func init() {
-        flag.IntVar(&flagvar, "flagname", 1234, "help message for flagname")
-    }
-Or you can create custom flags that satisfy the Value interface (with
-pointer receivers) and couple them to flag parsing by
-    flag.Var(&flagVal, "name", "help message for flagname")
-For such flags, the default value is just the initial value of the variable.
+	Define flags using flag.String(), Bool(), Int(), etc.
 
-After all flags are defined, call
-    flag.Parse()
-to parse the command line into the defined flags.
+	This declares an integer flag, -flagname, stored in the pointer ip, with type *int.
+		import "flag"
+		var ip = flag.Int("flagname", 1234, "help message for flagname")
+	If you like, you can bind the flag to a variable using the Var() functions.
+		var flagvar int
+		func init() {
+			flag.IntVar(&flagvar, "flagname", 1234, "help message for flagname")
+		}
+	Or you can create custom flags that satisfy the Value interface (with
+	pointer receivers) and couple them to flag parsing by
+		flag.Var(&flagVal, "name", "help message for flagname")
+	For such flags, the default value is just the initial value of the variable.
 
-Flags may then be used directly. If you're using the flags themselves,
-they are all pointers; if you bind to variables, they're values.
-    fmt.Println("ip has value ", *ip)
-    fmt.Println("flagvar has value ", flagvar)
+	After all flags are defined, call
+		flag.Parse()
+	to parse the command line into the defined flags.
 
-After parsing, the arguments after the flag are available as the
-slice flag.Args() or individually as flag.Arg(i).
-The arguments are indexed from 0 through flag.NArg()-1.
+	Flags may then be used directly. If you're using the flags themselves,
+	they are all pointers; if you bind to variables, they're values.
+		fmt.Println("ip has value ", *ip)
+		fmt.Println("flagvar has value ", flagvar)
 
-Command line flag syntax:
-    -flag
-    -flag=x
-    -flag x  // non-boolean flags only
-One or two minus signs may be used; they are equivalent.
-The last form is not permitted for boolean flags because the
-meaning of the command
-    cmd -x *
-will change if there is a file called 0, false, etc.  You must
-use the -flag=false form to turn off a boolean flag.
+	After parsing, the arguments after the flag are available as the
+	slice flag.Args() or individually as flag.Arg(i).
+	The arguments are indexed from 0 through flag.NArg()-1.
 
-Flag parsing stops just before the first non-flag argument
-("-" is a non-flag argument) or after the terminator "--".
+	Command line flag syntax:
+		-flag
+		-flag=x
+		-flag x  // non-boolean flags only
+	One or two minus signs may be used; they are equivalent.
+	The last form is not permitted for boolean flags because the
+	meaning of the command
+		cmd -x *
+	will change if there is a file called 0, false, etc.  You must
+	use the -flag=false form to turn off a boolean flag.
 
-Integer flags accept 1234, 0664, 0x1234 and may be negative.
-Boolean flags may be 1, 0, t, f, true, false, TRUE, FALSE, True, False.
-Duration flags accept any input valid for time.ParseDuration.
+	Flag parsing stops just before the first non-flag argument
+	("-" is a non-flag argument) or after the terminator "--".
 
-The default set of command-line flags is controlled by
-top-level functions.  The FlagSet type allows one to define
-independent sets of flags, such as to implement subcommands
-in a command-line interface. The methods of FlagSet are
-analogous to the top-level functions for the command-line
-flag set.
+	Integer flags accept 1234, 0664, 0x1234 and may be negative.
+	Boolean flags may be 1, 0, t, f, true, false, TRUE, FALSE, True, False.
+	Duration flags accept any input valid for time.ParseDuration.
+
+	The default set of command-line flags is controlled by
+	top-level functions.  The FlagSet type allows one to define
+	independent sets of flags, such as to implement subcommands
+	in a command-line interface. The methods of FlagSet are
+	analogous to the top-level functions for the command-line
+	flag set.
 */
 package flag
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
 	"io"
@@ -72,15 +72,6 @@ import (
 	"strings"
 	"time"
 )
-
-// EnvironmentPrefix defines a string that will be implicitely prefixed to a
-// flag name before looking it up in the environment variables.
-var EnvironmentPrefix = ""
-
-// DefaultConfigFlagname defines the flag name of the optional config file
-// path. Used to lookup and parse the config file when a default is set and
-// available on disk.
-var DefaultConfigFlagname = "config"
 
 // ErrHelp is the error returned if the flag -help is invoked but no such flag is defined.
 var ErrHelp = errors.New("flag: help requested")
@@ -860,163 +851,6 @@ func (f *FlagSet) Parse(arguments []string) error {
 	return nil
 }
 
-// ParseEnv parses flags from environment variables.
-// Flags already set will be ignored.
-func (f *FlagSet) ParseEnv(environ []string) error {
-
-	m := f.formal
-
-	env := make(map[string]string)
-	for _, s := range environ {
-		i := strings.Index(s, "=")
-		if i < 1 {
-			continue
-		}
-		env[s[0:i]] = s[i+1 : len(s)]
-	}
-
-	for _, flag := range m {
-		name := flag.Name
-		_, set := f.actual[name]
-		if set {
-			continue
-		}
-
-		flag, alreadythere := m[name]
-		if !alreadythere {
-			if name == "help" || name == "h" { // special case for nice help message.
-				f.usage()
-				return ErrHelp
-			}
-			return f.failf("environment variable provided but not defined: %s", name)
-		}
-
-		envKey := strings.ToUpper(flag.Name)
-		if f.envPrefix != "" {
-			envKey = f.envPrefix + "_" + envKey
-		}
-		envKey = strings.Replace(envKey, "-", "_", -1)
-
-		value, isSet := env[envKey]
-		if !isSet {
-			continue
-		}
-
-		hasValue := false
-		if len(value) > 0 {
-			hasValue = true
-		}
-
-		if fv, ok := flag.Value.(boolFlag); ok && fv.IsBoolFlag() { // special case: doesn't need an arg
-			if hasValue {
-				if err := fv.Set(value); err != nil {
-					return f.failf("invalid boolean value %q for environment variable %s: %v", value, name, err)
-				}
-			} else {
-				// flag without value is regarded a bool
-				fv.Set("true")
-			}
-		} else {
-			if err := flag.Value.Set(value); err != nil {
-				return f.failf("invalid value %q for environment variable %s: %v", value, name, err)
-			}
-		}
-
-		// update f.actual
-		if f.actual == nil {
-			f.actual = make(map[string]*Flag)
-		}
-		f.actual[name] = flag
-
-	}
-	return nil
-}
-
-// ParseFile parses flags from the file in path.
-// Same format as commandline argumens, newlines and lines beginning with a
-// "#" charater are ignored. Flags already set will be ignored.
-func (f *FlagSet) ParseFile(path string) error {
-
-	// Extract arguments from file
-	fp, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-	defer fp.Close()
-
-	scanner := bufio.NewScanner(fp)
-	for scanner.Scan() {
-		line := scanner.Text()
-
-		// Ignore empty lines
-		if len(line) == 0 {
-			continue
-		}
-
-		// Ignore comments
-		if line[:1] == "#" {
-			continue
-		}
-
-		// Match `key=value` and `key value`
-		var name, value string
-		hasValue := false
-		for i, v := range line {
-			if v == '=' || v == ' ' {
-				hasValue = true
-				name, value = line[:i], line[i+1:]
-				break
-			}
-		}
-
-		if hasValue == false {
-			name = line
-		}
-
-		// Ignore flag when already set; arguments have precedence over file
-		if f.actual[name] != nil {
-			continue
-		}
-
-		m := f.formal
-		flag, alreadythere := m[name]
-		if !alreadythere {
-			if name == "help" || name == "h" { // special case for nice help message.
-				f.usage()
-				return ErrHelp
-			}
-			return f.failf("configuration variable provided but not defined: %s", name)
-		}
-
-		if fv, ok := flag.Value.(boolFlag); ok && fv.IsBoolFlag() { // special case: doesn't need an arg
-			if hasValue {
-				if err := fv.Set(value); err != nil {
-					return f.failf("invalid boolean value %q for configuration variable %s: %v", value, name, err)
-				}
-			} else {
-				// flag without value is regarded a bool
-				fv.Set("true")
-			}
-		} else {
-			if err := flag.Value.Set(value); err != nil {
-				return f.failf("invalid value %q for configuration variable %s: %v", value, name, err)
-			}
-		}
-
-		// update f.actual
-		if f.actual == nil {
-			f.actual = make(map[string]*Flag)
-		}
-		f.actual[name] = flag
-	}
-
-	if err := scanner.Err(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // Parsed reports whether f.Parse has been called.
 func (f *FlagSet) Parsed() bool {
 	return f.parsed
@@ -1046,14 +880,6 @@ func NewFlagSet(name string, errorHandling ErrorHandling) *FlagSet {
 		name:          name,
 		errorHandling: errorHandling,
 	}
-	return f
-}
-
-// NewFlagSetWithEnvPrefix returns a new empty flag set with the specified name,
-// environment variable prefix, and error handling property.
-func NewFlagSetWithEnvPrefix(name string, prefix string, errorHandling ErrorHandling) *FlagSet {
-	f := NewFlagSet(name, errorHandling)
-	f.envPrefix = prefix
 	return f
 }
 
