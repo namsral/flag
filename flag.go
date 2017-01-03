@@ -829,6 +829,7 @@ func (f *FlagSet) usage() {
 	} else {
 		f.Usage()
 	}
+	os.Exit(0)
 }
 
 // parseOne parses one flag. It reports whether a flag was seen.
