@@ -106,6 +106,9 @@ func (f *FlagSet) ParseFile(path string) error {
 
 	// Extract arguments from file
 	fp, err := os.Open(path)
+	if os.IsNotExist(err){
+		return nil
+	}
 	if err != nil {
 		return err
 	}
