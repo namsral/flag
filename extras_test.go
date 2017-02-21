@@ -161,8 +161,8 @@ func TestDefaultConfigFlagnameMissingFile(t *testing.T) {
 	if err := os.Unsetenv("STRING"); err != nil {
 		t.Error(err)
 	}
-	if err := f.Parse([]string{}); err == nil {
-		t.Error("expected error of missing config file, got nil")
+	if err := f.Parse([]string{}); err != nil {
+		t.Errorf("expected nil of missing config file, got error: %v",err)
 	}
 }
 
