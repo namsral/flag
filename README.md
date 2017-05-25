@@ -16,13 +16,12 @@ $ cat > gopher.go
     	"github.com/namsral/flag"
 	)
     
-    var age int
-    
-    flag.IntVar(&age, "age", 0, "age of gopher")
-    flag.Parse()
-    
-    fmt.Print("age:", age)
-
+    func main() {
+    	var age int
+	flag.IntVar(&age, "age", 0, "age of gopher")
+	flag.Parse()
+	fmt.Print("age:", age)
+    }
 $ go run gopher.go -age 1
 age: 1
 ```
