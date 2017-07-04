@@ -935,20 +935,7 @@ func (f *FlagSet) Parse(arguments []string) error {
 		}
 	}
 
-	// Parse environment variables
-	if err := f.ParseEnv(os.Environ()); err != nil {
-		switch f.errorHandling {
-		case ContinueOnError:
-			return err
-		case ExitOnError:
-			os.Exit(2)
-		case PanicOnError:
-			panic(err)
-		}
-		return err
-	}
-
-	// Parse configuration from file
+	// Prepare for parse configuration from file
 	var cFile string
 	if cf := f.formal[DefaultConfigFlagname]; cf != nil {
 		cFile = cf.Value.String()
@@ -956,18 +943,44 @@ func (f *FlagSet) Parse(arguments []string) error {
 	if cf := f.actual[DefaultConfigFlagname]; cf != nil {
 		cFile = cf.Value.String()
 	}
-	if cFile != "" {
-		if err := f.ParseFile(cFile); err != nil {
-			switch f.errorHandling {
-			case ContinueOnError:
-				return err
-			case ExitOnError:
-				os.Exit(2)
-			case PanicOnError:
-				panic(err)
-			}
-			return err
+
+	// Parse environment variables and configuration from file
+	var envErr error
+	var fileErr error
+	if ParsePriority == ParsePriorityEnv {
+		envErr = f.ParseEnv(os.Environ())
+		if cFile != "" {
+			fileErr = f.ParseFile(cFile)
 		}
+	} else if ParsePriority == ParsePriorityFile {
+		if cFile != "" {
+			fileErr = f.ParseFile(cFile)
+		}
+		envErr = f.ParseEnv(os.Environ())
+	}
+
+	if envErr != nil {
+		switch f.errorHandling {
+		case ContinueOnError:
+			return envErr
+		case ExitOnError:
+			os.Exit(2)
+		case PanicOnError:
+			panic(envErr)
+		}
+		return envErr
+	}
+
+	if fileErr != nil {
+		switch f.errorHandling {
+		case ContinueOnError:
+			return fileErr
+		case ExitOnError:
+			os.Exit(2)
+		case PanicOnError:
+			panic(fileErr)
+		}
+		return fileErr
 	}
 
 	return nil
