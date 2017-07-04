@@ -145,6 +145,12 @@ $ go run ./gopher.go
 age=44
 ```
 
+#### Parsing Priority 
+```go
+flag.ParsePriority = flag.ParsePriorityEnv // parse environment variables first (default)
+flag.ParsePriority = flag.ParsePriorityFile // parse configuration file first
+flag.Parse()
+```
 
 You can also parse prefixed environment variables by setting a prefix name when creating a new empty flag set:
 
