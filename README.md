@@ -56,7 +56,7 @@ The following table shows how flags are translated to environment variables and 
 
 This package is a port of Go's [flag][] package from the standard library with the addition of two functions `ParseEnv` and `ParseFile`.
 
-[flag]: http://golang.org/src/pkg/flagconfiguration
+[flag]: http://golang.org/src/pkg/flag
 
 
 Goals
