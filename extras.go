@@ -10,6 +10,11 @@ import (
 	"strings"
 )
 
+// Parse priority
+const ParsePriorityFile = "File"
+const ParsePriorityEnv = "Env"
+var ParsePriority = ParsePriorityEnv
+
 // EnvironmentPrefix defines a string that will be implicitely prefixed to a
 // flag name before looking it up in the environment variables.
 var EnvironmentPrefix = ""
