@@ -1,7 +1,7 @@
 package main
 
 import (
-    "github.com/namsral/flag"
+    "github.com/bitgaming/flag"
     "fmt"
     )
 

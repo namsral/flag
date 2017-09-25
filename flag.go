@@ -948,28 +948,6 @@ func (f *FlagSet) Parse(arguments []string) error {
 		return err
 	}
 
-	// Parse configuration from file
-	var cFile string
-	if cf := f.formal[DefaultConfigFlagname]; cf != nil {
-		cFile = cf.Value.String()
-	}
-	if cf := f.actual[DefaultConfigFlagname]; cf != nil {
-		cFile = cf.Value.String()
-	}
-	if cFile != "" {
-		if err := f.ParseFile(cFile); err != nil {
-			switch f.errorHandling {
-			case ContinueOnError:
-				return err
-			case ExitOnError:
-				os.Exit(2)
-			case PanicOnError:
-				panic(err)
-			}
-			return err
-		}
-	}
-
 	return nil
 }
 

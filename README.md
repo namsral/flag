@@ -13,7 +13,7 @@ $ cat > gopher.go
 
     import (
         "fmt"
-    	"github.com/namsral/flag"
+    	"github.com/bitgaming/flag"
 	)
     
     func main() {
@@ -83,7 +83,7 @@ It's intended for projects which require a simple configuration made available t
 Example:
 
 ```go
-import "github.com/namsral/flag"
+import "github.com/bitgaming/flag"
 
 flag.String(flag.DefaultConfigFlagname, "", "path to config file")
 flag.Int("age", 24, "help message for age")
@@ -161,7 +161,7 @@ age=33
 
 For more examples see the [examples][] directory in the project repository.
 
-[examples]: https://github.com/namsral/flag/tree/master/examples
+[examples]: https://github.com/bitgaming/flag/tree/master/examples
 
 That's it.
 
