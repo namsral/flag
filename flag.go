@@ -1005,6 +1005,11 @@ func NewFlagSet(name string, errorHandling ErrorHandling) *FlagSet {
 	return f
 }
 
+// Set the environment prefix for all environment variables.
+func SetEnvPrefix(prefix string) {
+	CommandLine.envPrefix = prefix
+}
+
 // Init sets the name and error handling property for a flag set.
 // By default, the zero FlagSet uses an empty name, EnvironmentPrefix, and the
 // ContinueOnError error handling policy.
