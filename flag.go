@@ -871,7 +871,7 @@ func (f *FlagSet) parseOne() (bool, error) {
 		}
 	}
 	m := f.formal
-	flag, alreadythere := m[name] // BUG
+	flag, alreadythere := m[name]
 	if !alreadythere {
 		if name == "help" || name == "h" { // special case for nice help message.
 			f.usage()

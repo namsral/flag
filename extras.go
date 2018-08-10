@@ -152,7 +152,8 @@ func (f *FlagSet) ParseFile(path string) error {
 				f.usage()
 				return ErrHelp
 			}
-			return f.failf("configuration variable provided but not defined: %s", name)
+			// ignore if extra flag is defined in the config file
+			continue
 		}
 
 		if fv, ok := flag.Value.(boolFlag); ok && fv.IsBoolFlag() { // special case: doesn't need an arg
