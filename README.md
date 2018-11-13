@@ -5,7 +5,7 @@ Flag is a drop in replacement for Go's flag package with the addition to parse f
 
 [twelve-factor app methodology]: http://12factor.net
 
-An example using a gopher:
+An example using a command-line parameter:
 
 ```go
 $ cat > gopher.go
