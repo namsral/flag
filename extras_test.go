@@ -13,6 +13,14 @@ import (
 	. "github.com/namsral/flag"
 )
 
+// ResetForTesting clears all flag state and sets the usage function as directed.
+// After calling ResetForTesting, parse errors in flag handling will not
+// exit the program.
+func ResetForTesting(usage func()) {
+	CommandLine = NewFlagSet(os.Args[0], ContinueOnError)
+	Usage = usage
+}
+
 // Test parsing a environment variables
 func TestParseEnv(t *testing.T) {
 
