@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/namsral/flag"
+	. "github.com/robert-zaremba/flag"
 )
 
 func boolString(s string) string {
@@ -379,6 +379,16 @@ func TestHelp(t *testing.T) {
 	}
 }
 
+const defaultOutput2 = "  -A=false: for bootstrapping, allow 'any' type\n" +
+	"  -Alongflagname=false: disable bounds checking\n" +
+	"  -C=true: a boolean defaulting to true\n" +
+	"  -D=\"\": set relative `path` for local imports\n" +
+	"  -F=2.7: a non-zero `number`\n" +
+	"  -G=0: a float that defaults to zero\n" +
+	"  -N=27: a non-zero int\n" +
+	"  -Z=0: an int that defaults to zero\n" +
+	"  -maxT=0s: set `timeout` for dial\n"
+
 const defaultOutput = `  -A	for bootstrapping, allow 'any' type
   -Alongflagname
     	disable bounds checking
@@ -413,6 +423,6 @@ func TestPrintDefaults(t *testing.T) {
 	fs.PrintDefaults()
 	got := buf.String()
 	if got != defaultOutput {
-		t.Errorf("got %q want %q\n", got, defaultOutput)
+		t.Errorf("got\n%q want\n%q\n", got, defaultOutput)
 	}
 }

@@ -178,9 +178,5 @@ func (f *FlagSet) ParseFile(path string) error {
 		f.actual[name] = flag
 	}
 
-	if err := scanner.Err(); err != nil {
-		return err
-	}
-
-	return nil
+	return scanner.Err()
 }
