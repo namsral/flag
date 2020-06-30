@@ -49,7 +49,10 @@ func (f *FlagSet) ParseEnv(environ []string) error {
 		if f.envPrefix != "" {
 			envKey = f.envPrefix + "_" + envKey
 		}
+		// Replace all dashes (-) with underscores (_)
 		envKey = strings.Replace(envKey, "-", "_", -1)
+		// Replace all periods (.) with underscores (_)
+		envKey = strings.Replace(envKey, ".", "_", -1)
 
 		value, isSet := env[envKey]
 		if !isSet {
