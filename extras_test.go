@@ -171,7 +171,7 @@ func TestFlagSetParseErrors(t *testing.T) {
 	fs.Int("int", 0, "int value")
 
 	args := []string{"-int", "bad"}
-	expected := `invalid value "bad" for flag -int: strconv.ParseInt: parsing "bad": invalid syntax`
+	expected := `invalid value "bad" for flag -int: parse error`
 	if err := fs.Parse(args); err == nil || err.Error() != expected {
 		t.Errorf("expected error %q parsing from args, got: %v", expected, err)
 	}
@@ -179,7 +179,7 @@ func TestFlagSetParseErrors(t *testing.T) {
 	if err := os.Setenv("INT", "bad"); err != nil {
 		t.Fatalf("error setting env: %s", err.Error())
 	}
-	expected = `invalid value "bad" for environment variable int: strconv.ParseInt: parsing "bad": invalid syntax`
+	expected = `invalid value "bad" for environment variable int: parse error`
 	if err := fs.Parse([]string{}); err == nil || err.Error() != expected {
 		t.Errorf("expected error %q parsing from env, got: %v", expected, err)
 	}
@@ -189,7 +189,7 @@ func TestFlagSetParseErrors(t *testing.T) {
 
 	fs.String("config", "", "config filename")
 	args = []string{"-config", "testdata/bad_test.conf"}
-	expected = `invalid value "bad" for configuration variable int: strconv.ParseInt: parsing "bad": invalid syntax`
+	expected = `invalid value "bad" for configuration variable int: parse error`
 	if err := fs.Parse(args); err == nil || err.Error() != expected {
 		t.Errorf("expected error %q parsing from config, got: %v", expected, err)
 	}
