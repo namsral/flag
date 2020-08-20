@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/namsral/flag"
+	. "github.com/jnovack/flag"
 )
 
 // Test parsing a environment variables
