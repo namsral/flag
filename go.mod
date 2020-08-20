@@ -1,3 +1,3 @@
-module github.com/namsral/flag
+module github.com/jnovack/flag
 
-go 1.14
+go 1.15
