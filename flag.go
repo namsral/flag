@@ -863,25 +863,26 @@ func (f *FlagSet) parseOne() (bool, error) {
 	f.args = f.args[1:]
 	hasValue := false
 	value := ""
+	
+	// it's a flag. does it have an argument?
+	for i := 1; i < len(name); i++ { // equals cannot be first
+		if name[i] == '=' {
+			value = name[i+1:]
+			hasValue = true
+			name = name[0:i]
+			break
+		}
+	}
+	
 	dockerSecrets, err := secrets.NewDockerSecrets("")
-	if err != nil {
+	if err == nil {
 		secret, err := dockerSecrets.Get(name)
-		if err != nil {
+		if err == nil {
 			hasValue = true
 			value = secret
 		}
 	}
-	if !hasValue {
-		// it's a flag. does it have an argument?
-		for i := 1; i < len(name); i++ { // equals cannot be first
-			if name[i] == '=' {
-				value = name[i+1:]
-				hasValue = true
-				name = name[0:i]
-				break
-			}
-		}
-	}
+
 	m := f.formal
 	flag, alreadythere := m[name] // BUG
 	if !alreadythere {
