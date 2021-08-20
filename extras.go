@@ -8,6 +8,8 @@ import (
 	"bufio"
 	"os"
 	"strings"
+
+	secrets "github.com/ijustfool/docker-secrets"
 )
 
 // EnvironmentPrefix defines a string that will be implicitely prefixed to a
@@ -17,9 +19,7 @@ var EnvironmentPrefix = ""
 // ParseEnv parses flags from environment variables.
 // Flags already set will be ignored.
 func (f *FlagSet) ParseEnv(environ []string) error {
-
-	m := f.formal
-
+	dockerSecrets, _ := secrets.NewDockerSecrets("")
 	env := make(map[string]string)
 	for _, s := range environ {
 		i := strings.Index(s, "=")
@@ -29,8 +29,15 @@ func (f *FlagSet) ParseEnv(environ []string) error {
 		env[s[0:i]] = s[i+1 : len(s)]
 	}
 
+	m := f.formal
 	for _, flag := range m {
 		name := flag.Name
+		if dockerSecrets != nil {
+			if secret, err := dockerSecrets.Get(name); err == nil && flag.Value.Set(secret) == nil {
+				continue
+			}
+		}
+
 		_, set := f.actual[name]
 		if set {
 			continue

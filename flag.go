@@ -73,8 +73,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	secrets "github.com/ijustfool/docker-secrets"
 )
 
 // ErrHelp is the error returned if the -help or -h flag is invoked
@@ -863,7 +861,7 @@ func (f *FlagSet) parseOne() (bool, error) {
 	f.args = f.args[1:]
 	hasValue := false
 	value := ""
-	
+
 	// it's a flag. does it have an argument?
 	for i := 1; i < len(name); i++ { // equals cannot be first
 		if name[i] == '=' {
@@ -871,15 +869,6 @@ func (f *FlagSet) parseOne() (bool, error) {
 			hasValue = true
 			name = name[0:i]
 			break
-		}
-	}
-	
-	dockerSecrets, err := secrets.NewDockerSecrets("")
-	if err == nil {
-		secret, err := dockerSecrets.Get(name)
-		if err == nil {
-			hasValue = true
-			value = secret
 		}
 	}
 
