@@ -6,6 +6,7 @@ package flag_test
 
 import (
 	"os"
+	"strings"
 	"syscall"
 	"testing"
 	"time"
@@ -71,6 +72,17 @@ func TestParseEnv(t *testing.T) {
 	}
 }
 
+type arrayFlags []string
+
+func (i *arrayFlags) String() string {
+	return strings.Join(*i, " ")
+}
+
+func (i *arrayFlags) Set(value string) error {
+	*i = append(*i, value)
+	return nil
+}
+
 // Test parsing a configuration file
 func TestParseFile(t *testing.T) {
 
@@ -85,6 +97,9 @@ func TestParseFile(t *testing.T) {
 	stringFlag := f.String("string", "0", "string value")
 	float64Flag := f.Float64("float64", 0, "float64 value")
 	durationFlag := f.Duration("duration", 5*time.Second, "time.Duration value")
+
+	multi := new(arrayFlags)
+	f.Var(multi, "multi", "Array flags value")
 
 	err := f.ParseFile("./testdata/test.conf")
 	if err != nil {
@@ -117,6 +132,9 @@ func TestParseFile(t *testing.T) {
 	if *durationFlag != 2*time.Minute {
 		t.Error("duration flag should be 2m, is ", *durationFlag)
 	}
+	if multi.String() != "hello world" {
+		t.Error("value of array flags should be hello world, is ", multi.String())
+	}
 }
 
 func TestParseFileUnknownFlag(t *testing.T) {
@@ -138,6 +156,9 @@ func TestDefaultConfigFlagname(t *testing.T) {
 	stringFlag := f.String("string", "0", "string value")
 	f.Float64("float64", 0, "float64 value")
 	f.Duration("duration", 5*time.Second, "time.Duration value")
+
+	multi := new(arrayFlags)
+	f.Var(multi, "multi", "Array flags value")
 
 	f.String(DefaultConfigFlagname, "./testdata/test.conf", "config path")
 
